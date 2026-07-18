@@ -1,81 +1,95 @@
 import { useState } from "react";
 import styles from "./Auth.module.css";
 import { FORM_FIELDS } from "./utils";
+import { GoogleLogin } from "@react-oauth/google";
+import { useLoginViaGoogleMutation } from "./api/authSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { errorToast, successToast } from "@/services/slices/toastSlice";
+import { useRouter } from "next/router";
 
 
 export default function AuthPage() {
-  const [isLogin, setIsLogin] = useState(true);
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-  });
+  // const [isLogin, setIsLogin] = useState(true);
+  // const [formData, setFormData] = useState({
+  //   name: "",
+  //   email: "",
+  //   password: "",
+  // });
 
-  const toggleMode = () => {
-    setIsLogin((prev) => !prev);
-    setFormData({ name: "", email: "", password: "" });
-  };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+  const [loginViaGoogle] = useLoginViaGoogleMutation()
+  const dispatch = useDispatch();
+  const router = useRouter()
+  // const toggleMode = () => { 
+  //   setIsLogin((prev) => !prev);
+  //   setFormData({ name: "", email: "", password: "" });
+  // };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log(isLogin ? "Logging in:" : "Signing up:", formData);
-  };
+  // const handleChange = (e) => {
+  //   const { name, value } = e.target;
+  //   setFormData((prev) => ({ ...prev, [name]: value }));
+  // };
 
-  const activeFields = FORM_FIELDS.filter((field) => {
-    if (isLogin) {
-      return field.showInLogin; 
+  // const handleSubmit = (e) => {
+  //   e.preventDefault();
+  //   console.log(isLogin ? "Logging in:" : "Signing up:", formData);
+  // };
+
+  // const activeFields = FORM_FIELDS.filter((field) => {
+  //   if (isLogin) {
+  //     return field.showInLogin; 
+  //   }
+  //   return true; 
+  // });
+
+
+
+  const handleLogin  = async(credentialResponse) => {
+    try {
+      console.log('"hittttt" :>> ', "hittttt", );
+        const isLoginSuccess = await loginViaGoogle(credentialResponse);
+        console.log('isLoginSucess :>> ', isLoginSuccess);
+        if(isLoginSuccess?.data?.success){
+          dispatch(successToast({message: isLoginSuccess?.data?.message}))
+          router.push('/dashboard')
+        }else{
+          dispatch(errorToast({message: "Something went wrong"}))
+        }
+    } catch (error) {
+        dispatch(errorToast({message: error?.error}))
     }
-    return true; 
-  });
+  }
 
   return (
    <div className={styles.container}>
     <div className={styles.card}>
       <div className={styles.portalHeader}>
         <span className={styles.portalBrand}>Blogger</span>
-        <span className={styles.portalBadge}>Admin Portal</span>
+        <span className={styles.portalBadge}>Client Portal</span>
       </div>
 
-      <h1 className={styles.title}>{isLogin ? "Welcome Back" : "Create Account"}</h1>
+      <h1 className={styles.title}>{"Welcome Back" }</h1>
       <p className={styles.subtitle}>
-        {isLogin ? "Please sign in to your account" : "Sign up to get started"}
+        {"Please sign in to your account" }
       </p>
 
-        <form onSubmit={handleSubmit} className={styles.form}>
-          {activeFields.map((field) => (
-            <div key={field.id} className={styles.inputGroup}>
-              <label htmlFor={field.id} className={styles.label}>
-                {field.label}
-              </label>
-              <input
-                type={field.type}
-                id={field.id}
-                name={field.name}
-                className={styles.input}
-                placeholder={field.placeholder}
-                value={formData[field.name]}
-                onChange={handleChange}
-                required
-              />
-            </div>
-          ))}
+      
+<GoogleLogin
+  onSuccess={(credentialResponse) => {
+    console.log(credentialResponse);
+    handleLogin(credentialResponse)
+  }}
+  onError={() => {
+    console.log("Login Failed");
+  }}
+/>
 
-          <button type="submit" className={styles.submitBtn}>
-            {isLogin ? "Sign In" : "Sign Up"}
-          </button>
-        </form>
-
-        <p className={styles.toggleText}>
+        {/* <p className={styles.toggleText}>
           {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
           <button type="button" className={styles.toggleBtn} onClick={toggleMode}>
             {isLogin ? "Sign up" : "Sign in"}
           </button>
-        </p>
+        </p> */}
       </div>
     </div>
   );
