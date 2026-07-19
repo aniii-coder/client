@@ -1,0 +1,21 @@
+.container {
+  display: flex;
+  height: 100vh;      /* Force exactly viewport height */
+  overflow: hidden;   /* Lock the viewport container completely */
+  background: #f8fafc; 
+}
+
+.content {
+  flex: 1;
+  padding: 32px;
+  /* margin-left: 240px;  */
+  /* width: calc(100% - 240px); */
+  box-sizing: border-box;
+  
+  /* Make ONLY this content pane scrollable */
+  height: 100vh;
+  overflow-y: auto; 
+}
+body {
+  margin: 0;
+}

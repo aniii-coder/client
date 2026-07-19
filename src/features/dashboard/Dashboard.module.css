@@ -1,0 +1,475 @@
+.container {
+  padding: 24px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background-color: transparent;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Redesigned Toolbar Header Controls */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.pageTitle {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.dropdown, .searchBar {
+  padding: 10px 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background-color: #ffffff;
+  font-size: 0.875rem;
+  color: #334155;
+  outline: none;
+  font-weight: 500;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dropdown {
+  cursor: pointer;
+  padding-right: 36px;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 14px;
+}
+
+.dropdown:hover, .searchBar:hover {
+  border-color: #cbd5e1;
+  background-color: #f8fafc;
+}
+
+.dropdown:focus, .searchBar:focus {
+  border-color: #3b82f6;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
+}
+
+.searchBar {
+  width: 220px;
+}
+
+.searchBar:focus {
+  width: 280px;
+}
+
+/* Toggle View Controls (Grid vs List) */
+.toggleGroup {
+  display: flex;
+  background-color: #f1f5f9;
+  padding: 4px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.toggleBtn {
+  background: transparent;
+  border: none;
+  padding: 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.toggleBtn:hover {
+  color: #334155;
+}
+
+.toggleBtnActive {
+  background-color: #ffffff;
+  color: #3b82f6;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Grid Layout Architecture */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 24px;
+}
+
+/* Card Structures */
+.card {
+  background-color: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #e9eff6;
+  box-shadow: 0 4px 20px rgba(149, 157, 165, 0.08);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(149, 157, 165, 0.15);
+}
+
+/* Image Wrapper Layouts */
+.imageWrapper {
+  position: relative;
+  width: 100%;
+  padding-top: 52%;
+  overflow: hidden;
+  cursor: pointer;
+  background: #f7fafc;
+}
+
+.grid .imageWrapper {
+  border-radius: 16px 16px 0 0;
+}
+
+.bannerImage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.previewOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(15, 23, 42, 0.45);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.previewIcon {
+  width: 44px;
+  height: 44px;
+  color: #fff;
+  transform: scale(0.8);
+  transition: transform 0.3s ease;
+}
+
+.imageWrapper:hover .bannerImage {
+  transform: scale(1.06);
+}
+
+.imageWrapper:hover .previewOverlay {
+  opacity: 1;
+}
+
+.imageWrapper:hover .previewIcon {
+  transform: scale(1);
+}
+
+/* Author Section Layout */
+.authorRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 16px 8px 16px;
+}
+
+.authorMeta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.authorName {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #2d3748;
+}
+
+.dateText {
+  font-size: 0.8rem;
+  color: #718096;
+}
+
+/* Card Content Details */
+.cardBody {
+  padding: 0 16px 16px 16px;
+  flex-grow: 1;
+}
+
+.blogTitle {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin: 0 0 8px 0;
+  line-height: 1.3;
+}
+
+.blogDescription {
+  font-size: 0.88rem;
+  color: #4a5568;
+  margin: 0;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Footer Metrics Engagement Bar */
+.cardFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 24px;
+  border-top: 1px solid #f0f4f8;
+  background-color: #fafbfe;
+}
+
+.footerAction {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: none;
+  color: #4a5568;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.footerAction:hover {
+  background-color: #edf2f7;
+  color: #2b6cb0;
+}
+
+.actionIcon {
+  width: 18px;
+  height: 18px;
+  stroke-width: 2;
+}
+
+/* Alternative List Layout Mode View rules */
+.listView {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.listRow {
+  display: flex;
+  background-color: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e9eff6;
+  box-shadow: 0 2px 12px rgba(149, 157, 165, 0.04);
+  overflow: hidden;
+  align-items: center;
+  padding-right: 24px;
+  transition: all 0.2s ease;
+}
+
+.listRow:hover {
+  transform: translateX(4px);
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 20px rgba(149, 157, 165, 0.08);
+}
+
+.listRow .imageWrapper {
+  width: 180px;
+  min-width: 180px;
+  padding-top: 110px;
+  border-radius: 12px 0 0 12px;
+}
+
+.listContentArea {
+  display: flex;
+  flex-grow: 1;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  gap: 24px;
+}
+
+.listMainText {
+  flex-grow: 1;
+  max-width: 60%;
+}
+
+.listMetaRight {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.listActions {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+@media (max-width: 960px) {
+  .listContentArea {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  .listMainText {
+    max-width: 100%;
+  }
+  .listMetaRight {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 640px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .controls {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+  .dropdown, .searchBar {
+    flex: 1;
+    width: 100%;
+  }
+  .searchBar:focus {
+    width: 100%;
+  }
+  .listRow {
+    flex-direction: column;
+    padding-right: 0;
+  }
+  .listRow .imageWrapper {
+    width: 100%;
+    padding-top: 52%;
+    border-radius: 12px 12px 0 0;
+  }
+  .listContentArea {
+    padding: 16px;
+  }
+}
+
+
+.scrollSentinel {
+  padding: 20px;
+  text-align: center;
+  color: #64748b;
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  animation: pulseSentinel 1.5s infinite ease-in-out;
+}
+
+@keyframes pulseSentinel {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+.loadMoreContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 32px 0 16px 0;
+  width: 100%;
+}
+
+.loadMoreBtn {
+  background-color: #0f172a;
+  color: #ffffff;
+  padding: 10px 24px;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.loadMoreBtn:hover {
+  background-color: #1e293b;
+}
+
+/* 1. Ensure the parent container can anchor absolute elements */
+.avatarGroup {
+  position: relative;
+  display: inline-block;
+}
+
+/* 2. Style the tooltip card and hide it by default */
+.avatarTooltip {
+  position: absolute;
+  top: 110%; /* Positions the card directly below the avatar icon */
+  right: 0;
+  background-color: #ffffff;
+  color: #1e293b;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 10px 14px;
+  min-width: 180px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 50;
+  
+  /* Smooth fading animations */
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px);
+  transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+  
+  text-align: left;
+}
+
+/* 3. Reveal the tooltip naturally when hovering over the avatar group */
+.avatarGroup:hover .avatarTooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* 4. Style the text primitives inside the hover info card */
+.tooltipName {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.tooltipEmail {
+  margin: 2px 0 0 0;
+  font-size: 12px;
+  color: #64748b;
+  word-break: break-all;
+}
