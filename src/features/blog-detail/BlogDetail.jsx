@@ -282,9 +282,10 @@ dangerouslySetInnerHTML={{ __html: processContent(blogData.content) }}          
         <h3 className={styles.sectionHeadingTitle}>Related Articles You Might Like</h3>
         <div className={styles.relatedGrid}>
           {relatedBlogs.slice(0, 3).map((item) => (
-            <div key={item.id || item._id} className={styles.relatedCard} onClick={() => router.push(`/preview/${item.id || item._id}`)}>
+            <div key={item.id || item._id} className={styles.relatedCard} onClick={() => {}}>
               <img src={item.banner || "/api/placeholder/400/200"} alt="" className={styles.relatedImage} />
               <div className={styles.relatedBody}>
+                {console.log('item >> ', item)}
                 <h4>{item.title}</h4>
                 <p>{item.description}</p>
               </div>
