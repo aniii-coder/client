@@ -7,26 +7,24 @@ import { useDispatch, useSelector } from "react-redux";
 import { errorToast, successToast } from "@/services/slices/toastSlice";
 import { useRouter } from "next/router";
 
-
 function AuthPage() {
   const [loginViaGoogle] = useLoginViaGoogleMutation();
   const dispatch = useDispatch();
-  // const router = useRouter();
 
   const handleLogin = async (credentialResponse) => {
-    console.log('credentialResponse :>> ', credentialResponse);
-    localStorage.setItem("tempId", credentialResponse?.credential)
-    localStorage.setItem("client", credentialResponse?.clientId)
+    // sessionStorage.setItem("tempId", credentialResponse?.credential);
+    // sessionStorage.setItem("client", credentialResponse?.clientId);
+
     try {
       const isLoginSuccess = await loginViaGoogle(credentialResponse);
-          console.log("Sending to backend", isLoginSuccess);
 
-      console.log('isLoginSuccess :>> ', JSON.stringify(isLoginSuccess));
       if (isLoginSuccess?.data?.success) {
+        sessionStorage.setItem("loginData", JSON.stringify(isLoginSuccess));
+
         dispatch(
           successToast({
             message: isLoginSuccess?.data?.message,
-          }),
+          })
         );
 
         window.location.href = "/dashboard";
@@ -34,41 +32,29 @@ function AuthPage() {
         dispatch(
           errorToast({
             message: "Something went wrong",
-          }),
+          })
         );
       }
     } catch (error) {
       dispatch(
         errorToast({
           message: error?.message || "Login failed",
-        }),
+        })
       );
     }
   };
 
-
   return (
     <div className={styles.container}>
       <div className={styles.card}>
-
         <div className={styles.portalHeader}>
-          <span className={styles.portalBrand}>
-            Blogger
-          </span>
-
-          <span className={styles.portalBadge}>
-            Client Portal
-          </span>
+          <span className={styles.portalBrand}>Blogger</span>
+          <span className={styles.portalBadge}>Client Portal</span>
         </div>
 
-        <h1 className={styles.title}>
-          Welcome Back
-        </h1>
+        <h1 className={styles.title}>Welcome Back</h1>
 
-        <p className={styles.subtitle}>
-          Please sign in to your account
-        </p>
-
+        <p className={styles.subtitle}>Please sign in to your account</p>
 
         <GoogleLogin
           onSuccess={(credentialResponse) => {
@@ -82,14 +68,11 @@ function AuthPage() {
             );
           }}
         />
-
       </div>
     </div>
   );
 }
 
-
 AuthPage.noLayout = true;
-
 
 export default AuthPage;

@@ -22,11 +22,28 @@ export default function Dashboard() {
   const [likeBlog, { isLoading: isLiking }] = useLikeBlogMutation();
 
   const [limit, setLimit] = useState(9);
-  
+
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userData, setUserData] = useState(null);
 
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      const storedLoginData = sessionStorage.getItem("loginData");
+      if (storedLoginData) {
+        try {
+          const parsedData = JSON.parse(storedLoginData);
+          const userObj = parsedData?.data?.data;
+          if (userObj) {
+            setIsAuthenticated(true);
+            setUserData(userObj);
+            return;
+          }
+        } catch (error) {
+          console.error("Error parsing loginData from sessionStorage:", error);
+        }
+      }
+    }
+
     if (auth) {
       setIsAuthenticated(auth.isAuthenticated);
       setUserData(auth.user);
@@ -60,20 +77,12 @@ export default function Dashboard() {
   };
 
   const handlePreviewClick = (blog) => {
-    // const routeOptions = {
-    //   id: blog?._id,
-    //   // authorId: blog?.authorId,
-    //   previewMode: true
-    // };
-    // console.log('blog :>> ', routeOptions);
-   router.push({
-    pathname: '/dashboard/blog/[id]',
-    query: { 
-      id: blog?._id,           // This fills the [id] dynamic segment
-      // authorId: blog?.authorId, // Extra query params
-      // previewMode: 'true'       // Note: query values should be strings
-    }
-  });
+    router.push({
+      pathname: '/dashboard/blog/[id]',
+      query: { 
+        id: blog?._id,
+      }
+    });
   };
 
   const handleComment = (item) => {
@@ -129,21 +138,21 @@ export default function Dashboard() {
       console.error("Like error details:", err);
     }
   };
-const handleShareClick = (blog) => {
-  const baseUrl = window.location.origin;
-  const shareLink = `${baseUrl}/dashboard/blog/${blog?._id}?authorId=${blog?.authorId || ""}&previewMode=true`;
 
-  navigator.clipboard.writeText(shareLink)
-    .then(() => {
-      // Success alert
-      alert("Link copied to clipboard!"); 
-    })
-    .catch((err) => {
-      console.error("Failed to copy: ", err);
-      // Error alert
-      alert("Failed to copy link. Please try again.");
-    });
-};
+  const handleShareClick = (blog) => {
+    const baseUrl = window.location.origin;
+    const shareLink = `${baseUrl}/dashboard/blog/${blog?._id}?authorId=${blog?.authorId || ""}&previewMode=true`;
+
+    navigator.clipboard.writeText(shareLink)
+      .then(() => {
+        alert("Link copied to clipboard!"); 
+      })
+      .catch((err) => {
+        console.error("Failed to copy: ", err);
+        alert("Failed to copy link. Please try again.");
+      });
+  };
+
   const handleClosePopup = () => {
     const newQuery = { ...router.query };
     delete newQuery.activePopupId;
@@ -187,7 +196,6 @@ const handleShareClick = (blog) => {
 
   return (
     <div className={styles.container}>
-      {/* Header controls section */}
       <div className={styles.header}>
         <h2 className={styles.pageTitle}>Recent Blog Posts</h2>
         <div className={styles.controls}>
@@ -253,14 +261,14 @@ const handleShareClick = (blog) => {
                     fontWeight: "600",
                   }}
                 >
-                  {(userData?.firstName || userData?.email || "U")
+                  {(userData?.name || userData?.firstName || userData?.email || "U")
                     .slice(0, 2)
                     .toUpperCase()}
                 </div>
 
                 <div className={styles.avatarTooltip}>
                   <p className={styles.tooltipName}>
-                    {userData?.firstName || "User"}
+                    {userData?.name || userData?.firstName || "User"}
                   </p>
                   <p className={styles.tooltipEmail}>{userData?.email || ""}</p>
                 </div>
@@ -286,18 +294,12 @@ const handleShareClick = (blog) => {
           {viewMode === "grid" ? (
             <div className={styles.grid}>
               {blogsList.map((blog) => {
-                {
-                  console.log("userData :>> ", userData);
-                }
-                // Determine if the current user has liked this blog post
                 const isLikedByMe = !!(
                   userData &&
                   Array.isArray(blog?.likes) &&
                   blog.likes.includes(userData?._id || userData?.id)
                 );
-                {
-                  console.log("isLikedByMe :>> ", isLikedByMe);
-                }
+
                 return (
                   <div key={blog?._id} className={styles.card}>
                     <div
@@ -383,15 +385,12 @@ const handleShareClick = (blog) => {
           ) : (
             <div className={styles.listView}>
               {blogsList.map((blog) => {
-                console.log("blog :>> ", blog);
-                // Determine if the current user has liked this blog post
-                // Avoid the crash if likes is a number, not an array
                 const isLikedByMe = Array.isArray(blog?.likes)
                   ? blog.likes.some(
                       (likeId) =>
                         likeId === userData?._id || likeId === userData?.id,
                     )
-                  : false; // Fallback if data is just a number
+                  : false;
 
                 return (
                   <div key={blog?._id} className={styles.listRow}>
