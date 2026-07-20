@@ -19,7 +19,9 @@ function AuthPage() {
     localStorage.setItem("client", credentialResponse?.clientId)
     try {
       const isLoginSuccess = await loginViaGoogle(credentialResponse);
-      // console.log('isLoginSuccess :>> ', JSON.stringify(isLoginSuccess));
+          console.log("Sending to backend", isLoginSuccess);
+
+      console.log('isLoginSuccess :>> ', JSON.stringify(isLoginSuccess));
       if (isLoginSuccess?.data?.success) {
         dispatch(
           successToast({
