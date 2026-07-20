@@ -5,7 +5,16 @@ import { popupIds } from "./utils";
 import SidebarWrapperPopup from "@/components/sidebar-wrapper-popup/SidebarWrapperPopup";
 import { useRouter } from "next/router";
 import CommentSidebar from "./comment-sibar/CommentSidebar";
-import { Eye, MessageCircle, Share2, ThumbsUp, LayoutGrid, List, User } from "lucide-react";
+import { 
+  Eye, 
+  MessageCircle, 
+  Share2, 
+  ThumbsUp, 
+  LayoutGrid, 
+  List, 
+  User, 
+  Loader2 
+} from "lucide-react";
 import { useGetAllBlogsQuery, useLikeBlogMutation } from "./api";
 import { useAuthCheck } from "@/helper/isUserAuthenticated";
 import { useDispatch } from "react-redux";
@@ -19,6 +28,9 @@ export default function Dashboard() {
   const [searchInput, setSearchInput] = useState("");
   const [viewMode, setViewMode] = useState("grid");
   const dispatch = useDispatch();
+  
+  // Track which specific blog is currently triggering a like request
+  const [likingBlogId, setLikingBlogId] = useState(null);
   const [likeBlog, { isLoading: isLiking }] = useLikeBlogMutation();
 
   const [limit, setLimit] = useState(9);
@@ -58,7 +70,7 @@ export default function Dashboard() {
     setLimit(9);
   }, [search, sort, category]);
 
-  const { data: blogResponse, isLoading, isError } = useGetAllBlogsQuery({
+  const { data: blogResponse, isLoading, isFetching, isError } = useGetAllBlogsQuery({
     search: search || "",
     sort: sort || "",
     category: category || "All",
@@ -79,9 +91,7 @@ export default function Dashboard() {
   const handlePreviewClick = (blog) => {
     router.push({
       pathname: '/dashboard/blog/[id]',
-      query: { 
-        id: blog?._id,
-      }
+      query: { id: blog?._id }
     });
   };
 
@@ -113,6 +123,7 @@ export default function Dashboard() {
 
     if (isLiking) return; 
 
+    setLikingBlogId(blogId);
     try {
       const response = await likeBlog(blogId).unwrap();
       
@@ -136,6 +147,8 @@ export default function Dashboard() {
         })
       );
       console.error("Like error details:", err);
+    } finally {
+      setLikingBlogId(null);
     }
   };
 
@@ -196,6 +209,7 @@ export default function Dashboard() {
 
   return (
     <div className={styles.container}>
+      {/* Header section */}
       <div className={styles.header}>
         <h2 className={styles.pageTitle}>Recent Blog Posts</h2>
         <div className={styles.controls}>
@@ -282,13 +296,25 @@ export default function Dashboard() {
         </div>
       </div>
 
+      {/* Initial Fetch Loader */}
       {isLoading && blogsList.length === 0 && (
-        <div className={styles.loading}>Loading blogs...</div>
+        <div className={styles.grid}>
+          {Array.from({ length: 6 }).map((_, index) => (
+            <div key={index} className={`${styles.card} ${styles.skeletonCard}`}>
+              <div className={styles.skeletonImage} />
+              <div className={styles.skeletonText} />
+              <div className={styles.skeletonTextShort} />
+            </div>
+          ))}
+        </div>
       )}
+
+      {/* Error View */}
       {isError && (
         <div className={styles.error}>Failed to load blog updates.</div>
       )}
 
+      {/* Main Content Area */}
       {(!isLoading || blogsList.length > 0) && !isError && (
         <>
           {viewMode === "grid" ? (
@@ -299,6 +325,7 @@ export default function Dashboard() {
                   Array.isArray(blog?.likes) &&
                   blog.likes.includes(userData?._id || userData?.id)
                 );
+                const isThisBlogLiking = isLiking && likingBlogId === blog?._id;
 
                 return (
                   <div key={blog?._id} className={styles.card}>
@@ -344,13 +371,18 @@ export default function Dashboard() {
                       <button
                         className={`${styles.footerAction} ${isLikedByMe ? styles.likedActionBtn : ""}`}
                         title="Like"
+                        disabled={isThisBlogLiking}
                         onClick={() => handleLikeClick(blog?._id)}
                       >
-                        <ThumbsUp
-                          className={styles.actionIcon}
-                          fill={isLikedByMe ? "currentColor" : "none"}
-                          style={isLikedByMe ? { color: "#3b82f6" } : {}}
-                        />
+                        {isThisBlogLiking ? (
+                          <Loader2 className={`${styles.actionIcon} ${styles.spinner}`} size={16} />
+                        ) : (
+                          <ThumbsUp
+                            className={styles.actionIcon}
+                            fill={isLikedByMe ? "currentColor" : "none"}
+                            style={isLikedByMe ? { color: "#3b82f6" } : {}}
+                          />
+                        )}
                         <span
                           style={
                             isLikedByMe
@@ -361,6 +393,7 @@ export default function Dashboard() {
                           {blog?.likes?.length || 0}
                         </span>
                       </button>
+
                       <button
                         className={styles.footerAction}
                         title="Share"
@@ -369,6 +402,7 @@ export default function Dashboard() {
                         <Share2 className={styles.actionIcon} />
                         <span>0</span>
                       </button>
+
                       <button
                         className={styles.footerAction}
                         title="Comment"
@@ -391,6 +425,7 @@ export default function Dashboard() {
                         likeId === userData?._id || likeId === userData?.id,
                     )
                   : false;
+                const isThisBlogLiking = isLiking && likingBlogId === blog?._id;
 
                 return (
                   <div key={blog?._id} className={styles.listRow}>
@@ -432,13 +467,18 @@ export default function Dashboard() {
                           <button
                             className={`${styles.footerAction} ${isLikedByMe ? styles.likedActionBtn : ""}`}
                             title="Like"
+                            disabled={isThisBlogLiking}
                             onClick={() => handleLikeClick(blog?._id)}
                           >
-                            <ThumbsUp
-                              className={styles.actionIcon}
-                              fill={isLikedByMe ? "currentColor" : "none"}
-                              style={isLikedByMe ? { color: "#3b82f6" } : {}}
-                            />
+                            {isThisBlogLiking ? (
+                              <Loader2 className={`${styles.actionIcon} ${styles.spinner}`} size={16} />
+                            ) : (
+                              <ThumbsUp
+                                className={styles.actionIcon}
+                                fill={isLikedByMe ? "currentColor" : "none"}
+                                style={isLikedByMe ? { color: "#3b82f6" } : {}}
+                              />
+                            )}
                             <span
                               style={
                                 isLikedByMe
@@ -449,6 +489,7 @@ export default function Dashboard() {
                               {blog?.likes?.length || 0}
                             </span>
                           </button>
+
                           <button
                             className={styles.footerAction}
                             title="Share"
@@ -457,6 +498,7 @@ export default function Dashboard() {
                             <Share2 className={styles.actionIcon} />
                             <span>0</span>
                           </button>
+
                           <button
                             className={styles.footerAction}
                             title="Comment"
@@ -474,20 +516,29 @@ export default function Dashboard() {
             </div>
           )}
 
+          {/* Load More Button with Loader */}
           {hasMore && (
             <div className={styles.loadMoreContainer}>
               <button
                 onClick={handleLoadMore}
-                disabled={isLoading}
+                disabled={isFetching}
                 className={styles.loadMoreBtn}
               >
-                {isLoading ? "Loading..." : "Load More"}
+                {isFetching ? (
+                  <span className={styles.btnLoadingContent}>
+                    <Loader2 className={styles.spinner} size={18} />
+                    Loading...
+                  </span>
+                ) : (
+                  "Load More"
+                )}
               </button>
             </div>
           )}
         </>
       )}
 
+      {/* Popup / Sidebar Section */}
       {config && (
         <config.component
           {...config.getProps({
